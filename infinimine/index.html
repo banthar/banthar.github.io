@@ -1,0 +1,256 @@
+
+<html>
+<head>
+<style type="text/css">
+
+table
+{
+	border-spacing: 0;
+	table-layout: fixed;
+}
+
+td
+{
+	width: 32px;
+	height: 32px;
+	margin: 0px;
+	padding: 0px;
+
+	background-image: url(sprites.png);
+    background-repeat: no-repeat;
+}
+
+td.hidden{	background-position: 0px 0px;}
+td.flag{background-position: -32px 0px;}
+td.mine{background-position: -64px 0px;}
+
+td.clicked0{background-position: -96px 0px;}
+td.clicked1{background-position: -128px 0px;}
+td.clicked2{background-position: -160px 0px;}
+td.clicked3{background-position: -192px 0px;}
+td.clicked4{background-position: -224px 0px;}
+td.clicked5{background-position: -256px 0px;}
+td.clicked6{background-position: -288px 0px;}
+td.clicked7{background-position: -320px 0px;}
+td.clicked8{background-position: -352px 0px;}
+td.clicked9{background-position: -384px 0px;}
+
+</style>
+
+<script>
+
+function trace(x)
+{
+	console.debug(x);
+}
+
+Field = function(x,y)
+{
+
+	this.x=x;
+	this.y=y;
+	this.flag=false;
+	this.clicked=false;
+	this.mine=Math.random()>=0.90;
+	
+	this.td=document.createElement("TD");
+	this.td.className="hidden";
+	this.td.field=this;
+	
+	var t=this;
+
+	this.td.onclick=function(event){t.onMouseClick(event)};
+
+}
+
+Field.prototype.getNeighbours = function()
+{
+	var neighbours=new Array(0);
+
+	for(var y=this.y-1;y<=this.y+1;y++)
+	for(var x=this.x-1;x<=this.x+1;x++)
+	{
+
+		var n=getField(x,y);
+
+		if(n!=null && n!=this)
+			neighbours.push(n);
+
+	}
+
+	return neighbours;
+
+}
+
+Field.prototype.click = function(fifo)
+{
+
+	if(this.flag)
+		return;
+
+	if(this.mine)
+	{
+		this.td.className="mine";
+
+		for(var i=0;i<fields.length;i++)
+		{
+			fields[i].td.onclick=null;
+		}
+
+		return
+	}
+
+	var neighbours=this.getNeighbours();
+
+	var bombs=0;
+	var flags=0;
+
+	for(var i=0;i<neighbours.length;i++)
+	{
+		if(neighbours[i].mine)
+			bombs++;
+
+		if(neighbours[i].flag)
+			flags++;
+	}
+	
+	if(!this.clicked)
+	{
+
+		this.clicked=true;
+
+		if(bombs==0)
+			this.td.onclick=null;
+
+		this.td.className="clicked"+bombs;
+
+	}
+
+	if(bombs-flags==0)
+	{
+
+		for(var i=0;i<neighbours.length;i++)
+		{
+			if(!neighbours[i].clicked)
+			{
+				fifo.push(neighbours[i]);
+			}
+		}
+	}
+	
+}
+
+Field.prototype.placeFlag = function()
+{
+
+	if(this.clicked)
+		return;
+
+	if(this.flag)
+	{
+		this.flag=false;
+		this.td.className="hidden";
+	}
+	else
+	{
+		this.flag=true;
+		this.td.className="flag";
+	}
+}
+
+Field.prototype.onMouseClick = function(event)
+{
+
+	getField(this.x,this.y+1);
+
+	switch(event.button)
+	{
+		case 0:
+			var n=0;
+			var fifo=[];
+			this.click(fifo);
+			while(fifo.length>0)
+			{
+				var f=fifo.shift();
+				if(!f.clicked)
+					f.click(fifo);
+
+			}
+			break;
+		case 1:
+			this.placeFlag();
+			break;
+	}
+
+}
+
+Field.prototype.toString = function()
+{
+	return "Field("+x+", "+y+")";
+}
+
+var columns=Math.floor(screen.width/32)-1;
+var rows=0;
+
+var fields=new Array();
+
+function getField(x,y)
+{
+	if(x<0 || x>=columns || y<0)
+	{
+		return null;
+	}
+	else
+	{
+
+		while(y>=rows)
+			appendRow();
+
+		return fields[y*columns+x];
+	}
+}
+
+function appendRow()
+{
+
+	var board=document.getElementById("board");
+
+	var row=document.createElement("TR");
+
+	for(x=0;x<columns;x++)
+	{
+		var field=new Field(x,rows);
+		row.appendChild(field.td);
+		fields.push(field);
+	}
+
+	rows++;
+	board.appendChild(row);
+
+}
+
+function main()
+{
+
+	var board=document.getElementById("board");
+
+	//board.width=screen.width;
+	board.width=columns*32;
+
+	var maxY=Math.floor(screen.height/32);
+
+	for(y=0;y<maxY;y++)
+	{
+		appendRow();
+	}
+
+
+}
+
+</script>
+
+</head>
+<body onLoad="main();">
+<table id="board"></table>
+</body>
+</html>
