@@ -1,0 +1,72 @@
+* {
+  font-family: Sans;
+  margin: 0;
+  cursor: default;
+}
+
+body {
+  overflow: hidden;
+} 
+
+#screen {
+  overflow: hidden;
+  height: 100%;
+}
+
+.statusbar {
+  border-bottom: 1px solid black;
+  background: white;
+  width: 100%;
+}
+
+#hand {
+  position: relative;
+  top: -40px;
+  display: flex;
+  justify-content: flex-start;
+  background: white;
+  border-top: 1px solid black;
+}
+
+#hand .card {
+  position: relative;
+  top: -40px;
+  transition: top 0.2s;
+  margin: 4px;
+  margin-right: -140px;
+}
+
+#hand .card:hover{
+  top: -310px;
+  transition: top 0.2s;
+}
+
+.card {
+  min-width: 220px;
+  width: 220px;
+  border-radius: 8px;
+  border: 8px solid white;
+  box-shadow: 4px 4px 16px #888;
+}
+
+.card-header { 
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  font-weight: bold;
+  padding-left: 4px;
+}
+
+.card-description { 
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  height: 260px;
+  padding: 8px;
+}
+
+.card-footer { 
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  padding-left: 4px;
+}
