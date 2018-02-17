@@ -59,8 +59,15 @@ Field = function(x,y)
 	
 	var t=this;
 
-	this.td.onclick=function(event){t.onMouseClick(event)};
-
+	this.td.addEventListener('click', function(event ) {
+        t.onMouseClick(0);
+        return false;
+    });
+	this.td.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+        t.onMouseClick(1);
+        return false;
+    });
 }
 
 Field.prototype.getNeighbours = function()
@@ -94,7 +101,7 @@ Field.prototype.click = function(fifo)
 
 		for(var i=0;i<fields.length;i++)
 		{
-			fields[i].td.onclick=null;
+			Field.prototype.onMouseClick = function(button) {};
 		}
 
 		return
@@ -158,12 +165,12 @@ Field.prototype.placeFlag = function()
 	}
 }
 
-Field.prototype.onMouseClick = function(event)
+Field.prototype.onMouseClick = function(button)
 {
 
 	getField(this.x,this.y+1);
 
-	switch(event.button)
+	switch(button)
 	{
 		case 0:
 			var n=0;
